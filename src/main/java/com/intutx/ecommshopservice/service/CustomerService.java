@@ -7,15 +7,18 @@ import com.intutx.ecommshopservice.model.Customer;
 public interface CustomerService {
 
 
-	public Customer getCustomerByCustomerId(Long customerId);
-	public Customer getCustomerByLoginId(String loginId);
-	
 	public List<Customer> getAllCustomers();
+
+	public Customer findByCustomerId(Long customerId);
+	public Customer findByLoginId(String loginId);
+	public List<Customer> findByFirstName(String firstName);
+	public List<Customer> findByLastName(String lastName);
+	
+	public List<String> suggestLoginIds(String pattern);
 	
 	public boolean saveCustomer(Customer customer);
 	public void updateCustomer(Customer customer);
 	public void removeCustomer(String customerId);
 	
-	public List<String> suggestLogin(String pattern);
 	
 }

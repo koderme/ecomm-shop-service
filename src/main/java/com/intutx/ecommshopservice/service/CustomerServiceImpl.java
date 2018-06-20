@@ -15,21 +15,9 @@ import com.intutx.ecommshopservice.util.IdGenerator;
 @Component
 public class CustomerServiceImpl implements CustomerService {
 	private static final Logger logger = LoggerFactory.getLogger(CustomerServiceImpl.class);
-	
+
 	@Autowired
 	private CustomerRepository repo;
-
- 
-	@Override
-	public Customer getCustomerByCustomerId(Long customerId) {
-		Optional<Customer> obj = repo.findById(customerId);
-		return obj.isPresent()? obj.get() : null;
-	}
-
-	@Override
-	public Customer getCustomerByLoginId(String loginId) {
-		return repo.findByLoginId(loginId);
-	}
 
 	@Override
 	public List<Customer> getAllCustomers() {
@@ -37,13 +25,35 @@ public class CustomerServiceImpl implements CustomerService {
 	}
 
 	@Override
+	public Customer findByCustomerId(Long customerId) {
+		Optional<Customer> obj = repo.findById(customerId);
+		return obj.isPresent() ? obj.get() : null;
+	}
+
+	@Override
+	public Customer findByLoginId(String loginId) {
+		return repo.findByLoginId(loginId);
+	}
+
+	@Override
+	public List<Customer> findByFirstName(String firstName) {
+		return repo.findByFirstName(firstName);
+	}
+
+	@Override
+	public List<Customer> findByLastName(String lastName) {
+		return repo.findByLastName(lastName);
+	}
+
+	// --------------------------------------------------------------
+	@Override
 	public boolean saveCustomer(Customer inCust) {
 
 		Customer customer = repo.findByLoginId(inCust.getLoginId());
-		
+
 		if (customer == null) {
 			if (inCust.getCustomerId() != null) {
-				logger.warn("Customer id {} contained in request will be overriden", inCust.getCustomerId() );
+				logger.warn("Customer id {} contained in request will be overriden", inCust.getCustomerId());
 			}
 			inCust.setCustomerId(IdGenerator.getRandomId());
 			logger.info("creating new customer {}", inCust);
@@ -51,8 +61,8 @@ public class CustomerServiceImpl implements CustomerService {
 			logger.info("created new customer {} ", newCustomer);
 			return true;
 
-		} 
-		
+		}
+
 		logger.error("customer with login {} already exists", inCust.getLoginId());
 		return false;
 	}
@@ -60,21 +70,19 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public void updateCustomer(Customer customer) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void removeCustomer(String customerId) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public List<String> suggestLogin(String pattern) {
+	public List<String> suggestLoginIds(String pattern) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-		
-	
 }
