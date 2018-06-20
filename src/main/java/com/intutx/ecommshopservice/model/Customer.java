@@ -2,8 +2,6 @@ package com.intutx.ecommshopservice.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -116,6 +114,7 @@ public class Customer {
 				+ phoneVerified + "]";
 	}
 
+	public static Customer dummy = new Customer(123L, "dummy", "Mr", "First", "M", "Last", "N");
 
 
 }
