@@ -1,6 +1,5 @@
 package com.intutx.ecommshopservice.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.intutx.ecommshopservice.model.Customer;
+import com.intutx.ecommshopservice.model.CustomerProfile;
 import com.intutx.ecommshopservice.service.CustomerService;
 
 @Controller
@@ -27,73 +27,108 @@ public class CustomerController {
 
 	private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
 
-	private ResponseEntity<Customer> toResponseEntity(Customer customer) {
-		return customer != null ? new ResponseEntity<Customer>(customer, HttpStatus.OK)
-				: new ResponseEntity<Customer>(HttpStatus.NOT_FOUND);
-	}
-
-	private ResponseEntity<List<Customer>> toResponseEntity(List<Customer> customerList) {
-		System.out.println("list size : " + customerList.size());
-		return !customerList.isEmpty() ? new ResponseEntity<List<Customer>>(customerList, HttpStatus.OK)
-				: new ResponseEntity<List<Customer>>(HttpStatus.NOT_FOUND);
-	}
-
 	@Autowired
 	private CustomerService customerService;
 	
-	@GetMapping()
-	public @ResponseBody Iterable<Customer> getAll() {
-		return customerService.getAllCustomers();
+
+	// ---- helper methods
+	private ResponseEntity<CustomerProfile> _toResponseEntity(CustomerProfile customer) {
+		return customer != null ? new ResponseEntity<CustomerProfile>(customer, HttpStatus.OK)
+				: new ResponseEntity<CustomerProfile>(HttpStatus.NOT_FOUND);
 	}
 
-	@GetMapping(path = "/{id}")
-	public @ResponseBody ResponseEntity<Customer> getCustomer(@PathVariable("id") Long customerId) {
-		logger.info("searching for id: " + customerId);
-		if (customerId == null || customerId <= 0L)
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-		Customer customer = customerService.findByCustomerId(customerId);
-		return toResponseEntity(customer);
+	private ResponseEntity<List<CustomerProfile>> _toResponseEntity(List<CustomerProfile> customerList) {
+		System.out.println("list size : " + customerList.size());
+		return !customerList.isEmpty() ? new ResponseEntity<List<CustomerProfile>>(customerList, HttpStatus.OK)
+				: new ResponseEntity<List<CustomerProfile>>(HttpStatus.NOT_FOUND);
 	}
 
-	@GetMapping(path = RestUri.SEARCH)
-	public ResponseEntity<List<Customer>> getCustomer(@RequestParam(name = "loginId", defaultValue = "") String loginId,
-			@RequestParam(name = "firstName", defaultValue = "") String firstName,
-			@RequestParam(name = "lastName", defaultValue = "") String lastName) {
+	// ---- register Customer
+	@RequestMapping(path = RestUri.REGISTER, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody ResponseEntity<Boolean> register(@RequestBody Customer custToBeSaved) {
 
-		logger.info("searching by loginId={}, firstName={}, lastName={} ", loginId, firstName, lastName);
+		logger.info("register customer {}", custToBeSaved);
 
-		// If loginId is specified, ignore others
-		if (loginId != null && !loginId.isEmpty()) {
-			Customer customer = customerService.findByLoginId(loginId);
+		if (custToBeSaved == null)
+			return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
 
-			List<Customer> tempList = new ArrayList<Customer>();
-			tempList.add(customer);
-			return toResponseEntity(tempList);
-		} else if (firstName != null && !firstName.isEmpty()) {
-			List<Customer> customerList = customerService.findByFirstName(firstName);
-			return toResponseEntity(customerList);
-
-		} else if (lastName != null && !lastName.isEmpty()) {
-			List<Customer> customerList = customerService.findByLastName(lastName);
-			return toResponseEntity(customerList);
-		} else {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
+		boolean result = customerService.register(custToBeSaved);
+		logger.info("result {}", result);
+		return result ? new ResponseEntity<>(result, HttpStatus.OK)
+				: new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
 	}
 
-	@RequestMapping(path = RestUri.CREATE, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
-	public @ResponseBody ResponseEntity<Boolean> create(@RequestBody Customer custToBeSaved) {
+	// ---- login
+	@RequestMapping(path = RestUri.LOGIN, 
+			method = RequestMethod.POST, 
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE, 
+			consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody ResponseEntity<Boolean> login(@RequestBody Customer cust) {
+
+		logger.info("login request {}", cust);
+
+		boolean result = customerService.login(cust);
+		logger.info("result {}", result);
+		return result ? new ResponseEntity<>(result, HttpStatus.OK)
+				: new ResponseEntity<>(false, HttpStatus.UNAUTHORIZED);
+	}
+
+	// ---- save CustomerProfile
+	@RequestMapping(path = RestUri.SAVE, method = RequestMethod.POST, 
+			produces = MediaType.APPLICATION_JSON_UTF8_VALUE, 
+			consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	public @ResponseBody ResponseEntity<Boolean> save(@RequestBody CustomerProfile custToBeSaved) {
 
 		logger.info("create request {}", custToBeSaved);
 		
 		if (custToBeSaved == null)
 			return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
 
-		boolean result = customerService.saveCustomer(custToBeSaved);
+		boolean result = customerService.save(custToBeSaved);
 		logger.info("result {}", result);
 		return result ? new ResponseEntity<>(result, HttpStatus.OK)
 				: new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
 	}
+
+
+	// ---- search by id 
+	@GetMapping(path = "/{id}")
+	public @ResponseBody ResponseEntity<CustomerProfile> getCustomerProfile(@PathVariable("id") Long customerId) {
+		logger.info("searching for id: " + customerId);
+		if (customerId == null || customerId <= 0L)
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+		CustomerProfile customer = customerService.findByCustomerId(customerId);
+		return _toResponseEntity(customer);
+	}
+
+	// ---- search by firstname, lastname
+	@GetMapping(path = RestUri.SEARCH)
+	public ResponseEntity<List<CustomerProfile>> getCustomerProfile(
+			@RequestParam(name = "firstName", defaultValue = "") String firstName,
+			@RequestParam(name = "lastName", defaultValue = "") String lastName) {
+
+		logger.info("searching by firstName={} or lastName={} ", firstName, lastName);
+
+		// If loginId is specified, ignore others
+		if (firstName != null && !firstName.isEmpty()) {
+			List<CustomerProfile> customerList = customerService.findByFirstName(firstName);
+			return _toResponseEntity(customerList);
+
+		} else if (lastName != null && !lastName.isEmpty()) {
+			List<CustomerProfile> customerList = customerService.findByLastName(lastName);
+			return _toResponseEntity(customerList);
+		} else {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	
+	// ---- list all customers
+	@GetMapping()
+	public @ResponseBody Iterable<CustomerProfile> getAll() {
+		return customerService.getAll();
+	}
+
 
 }

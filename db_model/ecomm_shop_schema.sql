@@ -55,11 +55,7 @@ DROP TABLE IF EXISTS ecomm_shop.customer ;
 CREATE TABLE IF NOT EXISTS ecomm_shop.customer (
   customer_id      BIGINT NOT NULL,
   login_id         VARCHAR(100) NOT NULL,
-  prefix           VARCHAR(10) NOT NULL,
-  first_name       VARCHAR(100) ,
-  middle_name      VARCHAR(100) ,
-  last_name        VARCHAR(100) NOT NULL,
-  phone_verified   CHAR(1) DEFAULT 'Y',
+  password         VARCHAR(500) NOT NULL,
   updated_by       VARCHAR(50) NOT NULL default 'system',
   updated_date     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (customer_id))
@@ -68,6 +64,33 @@ DEFAULT CHARACTER SET = utf8;
 
 CREATE UNIQUE INDEX idx_customer_li
 ON ecomm_shop.customer (login_id);
+
+----------------------------------------------------
+DROP TABLE IF EXISTS ecomm_shop.customer_profile ;
+
+CREATE TABLE IF NOT EXISTS ecomm_shop.customer_profile (
+  customer_id      BIGINT NOT NULL,
+  gender           CHAR(1) DEFAULT 'Y',
+  prefix           VARCHAR(10) ,
+  first_name       VARCHAR(100) NOT NULL,
+  middle_name      VARCHAR(100) ,
+  last_name        VARCHAR(100) NOT NULL,
+  dob              DATE,
+  phone_number     VARCHAR(20),
+  phone_verified   CHAR(1) DEFAULT 'Y',
+  updated_by       VARCHAR(50) NOT NULL default 'system',
+  updated_date     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (customer_id),
+
+  CONSTRAINT fk_customer_profile_ci
+    FOREIGN KEY (customer_id)
+    REFERENCES ecomm_shop.customer (customer_id)
+    ON DELETE NO ACTION)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE INDEX idx_customer_profile_flp
+ON ecomm_shop.customer_profile (first_name, last_name, phone_number);
 
 ----------------------------------------------------
 DROP TABLE IF EXISTS ecomm_shop.customer_address ;

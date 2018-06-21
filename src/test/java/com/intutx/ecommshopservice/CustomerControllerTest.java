@@ -2,7 +2,10 @@ package com.intutx.ecommshopservice;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
@@ -24,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.intutx.ecommshopservice.controller.CustomerController;
 import com.intutx.ecommshopservice.controller.RestUri;
-import com.intutx.ecommshopservice.model.Customer;
+import com.intutx.ecommshopservice.model.CustomerProfile;
 import com.intutx.ecommshopservice.service.CustomerService;
 
 @RunWith(SpringRunner.class)
@@ -37,19 +40,29 @@ public class CustomerControllerTest {
 	@MockBean
 	private CustomerService service;
 
-	Customer cust1;
-	List<Customer> custList1;
+	CustomerProfile cust1;
+	List<CustomerProfile> custList1;
 	
-	Customer cust2;
-	List<Customer> custList2;
+	CustomerProfile cust2;
+	List<CustomerProfile> custList2;
 	ObjectMapper pojo2Json;
 
 	{
-		this.cust1 = new Customer(111L, "aby", "Mr", "Aby", "M", "White", "N");
+		Date d1 = null;
+		Date d2 = null;
+		try {
+			d1 = new SimpleDateFormat("yyyy-MM-dd").parse("2004-04-04");
+			d2= new SimpleDateFormat("yyyy-MM-dd").parse("2005-05-05");
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		this.cust1 = new CustomerProfile(111L, "M", "Mr", "Abba", "Z", "White", d1, "+91 800 111 5566", "N");
 		this.custList1 = new ArrayList<>();
 		this.custList1.add(cust1);
 		
-		this.cust2 = new Customer(222L, "boris", "Mr", "Boris", "M", "Becker", "N");
+		this.cust2 = new CustomerProfile(222L, "M", "Mr", "Boris", "S", "Becker", d2, "+91 800 222 5566", "N");
 		this.custList2 = new ArrayList<>();
 		this.custList2.add(cust2);
 		this.pojo2Json = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
@@ -94,47 +107,12 @@ public class CustomerControllerTest {
 		assertEquals("compare status code", HttpStatus.OK.value(), response.getResponse().getStatus());
 
 		// Verify response
+		System.out.println(" ----expected----" +  expected);
+		System.out.println(" ----actual----" +  response.getResponse().getContentAsString());
 		JSONAssert.assertEquals(expected, response.getResponse().getContentAsString(), false);
 	}
 	
-	@Test
-	public void customer_search_invalid_request_test() throws Exception {
-
-		// Wire the mock...to replace actual service
-		Mockito.when(service.findByLoginId(cust1.getLoginId())).thenReturn(cust1);
-
-		// Create request
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get(RestUri.CUSTOMERS_SEARCH).accept(MediaType.APPLICATION_JSON);
-
-		// Call rest service
-		MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-		// Verify status code
-		assertEquals("compare status code", HttpStatus.BAD_REQUEST.value(), response.getResponse().getStatus());
-
-	}
 	
-	@Test
-	public void customer_search_loginId_specified_test() throws Exception {
-
-		// Wire the mock...to replace actual service
-		Mockito.when(service.findByLoginId(cust1.getLoginId())).thenReturn(cust1);
-
-		// Create request
-		RequestBuilder requestBuilder = MockMvcRequestBuilders.get(RestUri.CUSTOMERS_SEARCH + "?loginId=" + cust1.getLoginId()).accept(MediaType.APPLICATION_JSON);
-
-		// Call rest service
-		MvcResult response = mockMvc.perform(requestBuilder).andReturn();
-
-		// The expected
-		String expected = pojo2Json.writeValueAsString(custList1);
-		
-		// Verify status code
-		assertEquals("compare status code", HttpStatus.OK.value(), response.getResponse().getStatus());
-
-		// Verify response
-		JSONAssert.assertEquals(expected, response.getResponse().getContentAsString(), false);
-	}
 	
 	
 	@Test
@@ -187,13 +165,13 @@ public class CustomerControllerTest {
 	public void customer_save_invalid_request_test() throws Exception {
 
 		// Wire the mock...to replace actual service
-		Mockito.when(service.saveCustomer(cust1)).thenReturn(false);
+		Mockito.when(service.save(cust1)).thenReturn(false);
 		
 		// Create request
 		//RequestBuilder requestBuilder = MockMvcRequestBuilders.post(RestUri.CUSTOMERS_CREATE).accept(MediaType.APPLICATION_JSON_UTF8_VALUE);
 		String requestBody = pojo2Json.writeValueAsString(cust1);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-											.post(RestUri.CUSTOMERS_CREATE)
+											.post(RestUri.CUSTOMERS_SAVE)
 											.accept(MediaType.APPLICATION_JSON).content(requestBody)
 											.contentType(MediaType.APPLICATION_JSON);
 
@@ -212,13 +190,13 @@ public class CustomerControllerTest {
 	public void customer_save_valid_request_test() throws Exception {
 
 		// Wire the mock...to replace actual service
-		Mockito.when(service.saveCustomer(cust1)).thenReturn(true);
+		Mockito.when(service.save(cust1)).thenReturn(true);
 		
 		// Create request
 		//RequestBuilder requestBuilder = MockMvcRequestBuilders.post(RestUri.CUSTOMERS_CREATE).accept(MediaType.APPLICATION_JSON_UTF8_VALUE);
 		String requestBody = pojo2Json.writeValueAsString(cust1);
 		RequestBuilder requestBuilder = MockMvcRequestBuilders
-											.post(RestUri.CUSTOMERS_CREATE)
+											.post(RestUri.CUSTOMERS_SAVE)
 											.accept(MediaType.APPLICATION_JSON).content(requestBody)
 											.contentType(MediaType.APPLICATION_JSON);
 
@@ -232,6 +210,5 @@ public class CustomerControllerTest {
 		assertEquals(expected, response.getResponse().getContentAsString());
 
 	}
-	
-	
+
 }
