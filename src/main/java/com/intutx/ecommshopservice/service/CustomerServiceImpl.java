@@ -32,6 +32,8 @@ public class CustomerServiceImpl implements CustomerService {
 
 	@Override
 	public Customer findByLoginId(String loginId) {
+		logger.info("saveCustomer");
+
 		return repo.findByLoginId(loginId);
 	}
 
@@ -49,21 +51,21 @@ public class CustomerServiceImpl implements CustomerService {
 	@Override
 	public boolean saveCustomer(Customer inCust) {
 
+		logger.info("saveCustomer");
 		Customer customer = repo.findByLoginId(inCust.getLoginId());
-
 		if (customer == null) {
 			if (inCust.getCustomerId() != null) {
 				logger.warn("Customer id {} contained in request will be overriden", inCust.getCustomerId());
 			}
 			inCust.setCustomerId(IdGenerator.getRandomId());
-			logger.info("creating new customer {}", inCust);
+			logger.debug("creating new customer {}", inCust);
 			Customer newCustomer = repo.save(inCust);
 			logger.info("created new customer {} ", newCustomer);
 			return true;
 
 		}
 
-		logger.error("customer with login {} already exists", inCust.getLoginId());
+		logger.error("Customer with loginId {} already exists", inCust.getLoginId());
 		return false;
 	}
 

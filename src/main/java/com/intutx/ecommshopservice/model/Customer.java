@@ -114,7 +114,4 @@ public class Customer {
 				+ phoneVerified + "]";
 	}
 
-	public static Customer dummy = new Customer(123L, "dummy", "Mr", "First", "M", "Last", "N");
-
-
 }

@@ -22,7 +22,7 @@ import com.intutx.ecommshopservice.model.Customer;
 import com.intutx.ecommshopservice.service.CustomerService;
 
 @Controller
-@RequestMapping(path = RestUri.CUSTOMER)
+@RequestMapping(path = RestUri.CUSTOMERS)
 public class CustomerController {
 
 	private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
@@ -39,11 +39,11 @@ public class CustomerController {
 	}
 
 	@Autowired
-	private CustomerService service;
-
+	private CustomerService customerService;
+	
 	@GetMapping()
 	public @ResponseBody Iterable<Customer> getAll() {
-		return service.getAllCustomers();
+		return customerService.getAllCustomers();
 	}
 
 	@GetMapping(path = "/{id}")
@@ -52,7 +52,7 @@ public class CustomerController {
 		if (customerId == null || customerId <= 0L)
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-		Customer customer = service.findByCustomerId(customerId);
+		Customer customer = customerService.findByCustomerId(customerId);
 		return toResponseEntity(customer);
 	}
 
@@ -65,32 +65,35 @@ public class CustomerController {
 
 		// If loginId is specified, ignore others
 		if (loginId != null && !loginId.isEmpty()) {
-			Customer customer = service.findByLoginId(loginId);
+			Customer customer = customerService.findByLoginId(loginId);
 
-			List<Customer> tempList = new ArrayList();
+			List<Customer> tempList = new ArrayList<Customer>();
 			tempList.add(customer);
 			return toResponseEntity(tempList);
 		} else if (firstName != null && !firstName.isEmpty()) {
-			List<Customer> customerList = service.findByFirstName(firstName);
+			List<Customer> customerList = customerService.findByFirstName(firstName);
 			return toResponseEntity(customerList);
 
 		} else if (lastName != null && !lastName.isEmpty()) {
-			List<Customer> customerList = service.findByLastName(lastName);
+			List<Customer> customerList = customerService.findByLastName(lastName);
 			return toResponseEntity(customerList);
 		} else {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	@RequestMapping(path = "/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
+	@RequestMapping(path = RestUri.CREATE, method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE, consumes = MediaType.APPLICATION_JSON_UTF8_VALUE)
 	public @ResponseBody ResponseEntity<Boolean> create(@RequestBody Customer custToBeSaved) {
 
+		logger.info("create request {}", custToBeSaved);
+		
 		if (custToBeSaved == null)
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
 
-		boolean result = service.saveCustomer(custToBeSaved);
+		boolean result = customerService.saveCustomer(custToBeSaved);
+		logger.info("result {}", result);
 		return result ? new ResponseEntity<>(result, HttpStatus.OK)
-				: new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+				: new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
 	}
 
 }
