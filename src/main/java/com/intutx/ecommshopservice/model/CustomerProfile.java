@@ -42,6 +42,9 @@ public class CustomerProfile {
 	@Column(name = "phone_verified")
 	private String phoneVerified;
 
+	public CustomerProfile() {
+		super();
+	}
 	public CustomerProfile(Long customerId, String gender, String prefix, String firstName, String middleName,
 			String lastName, Date dob, String phoneNumber, String phoneVerified) {
 		super();

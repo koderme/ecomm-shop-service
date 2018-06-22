@@ -8,7 +8,7 @@ import com.intutx.ecommshopservice.model.CustomerProfile;
 
 public interface CustomerProfileRepository extends CrudRepository<CustomerProfile, Long>{
 
-        CustomerProfile findByLoginId(String loginId);
+        //CustomerProfile findByLoginId(String loginId);
         List<CustomerProfile> findByFirstName(String firstName);
         List<CustomerProfile> findByLastName(String lastName);
 

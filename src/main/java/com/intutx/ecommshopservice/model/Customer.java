@@ -33,6 +33,9 @@ public class Customer {
 		return password;
 	}
 
+	public Customer() {
+		super();
+	}
 	public Customer(Long customerId, String loginId, String password) {
 		super();
 		this.customerId = customerId;
