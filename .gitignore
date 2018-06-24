@@ -25,3 +25,4 @@
 /.nb-gradle/
 /.mvn/wrapper/maven-wrapper.jar
 /.mvn/wrapper/maven-wrapper.properties
+/db_model/sql_generator/__pycache__
