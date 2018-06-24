@@ -1,9 +1,13 @@
 #!/usr/bin/python
 
-KEY_SELECT = 'select'
+KEY_SELECT = 'select '
+KEY_INSERT = 'insert into '
 KEY_FROM = ' from'
+KEY_VALUES = ' values'
 KEY_DUAL = ' dual'
 KEY_UNION = ' union'
+KEY_ORB = ' ('
+KEY_CRB = ' )'
 
 class SqlStatement:
 
@@ -12,9 +16,7 @@ class SqlStatement:
 
 	def generateSelect(self, rowCount):
 		rowString = ''
-		print(rowCount)
 		for i in range(rowCount):
-			print(i)
 			colString = KEY_SELECT
 
 			colString = colString + self.table.toString(i)
@@ -26,3 +28,10 @@ class SqlStatement:
 
 		return rowString
 
+	def generateInsert(self):
+		colString = KEY_INSERT
+		colString = colString +  self.table.schemaTableName()
+		colString = colString +  KEY_ORB
+		colString = colString +  self.table.columnName(",")
+		colString = colString +  KEY_CRB
+		return colString
