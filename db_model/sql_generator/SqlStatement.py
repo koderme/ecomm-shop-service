@@ -8,6 +8,7 @@ KEY_DUAL = ' dual'
 KEY_UNION = ' union'
 KEY_ORB = ' ('
 KEY_CRB = ' )'
+KEY_SC = ' ;'
 
 class SqlStatement:
 
@@ -26,7 +27,7 @@ class SqlStatement:
 				colString = colString + KEY_UNION
 			rowString = rowString  + '\n\r' + colString
 
-		return rowString
+		return rowString + KEY_SC
 
 	def generateInsert(self):
 		colString = KEY_INSERT

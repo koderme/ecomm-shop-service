@@ -8,6 +8,104 @@ import  SqlStatement
 cDmy = Column.Column('dummy', 'any', 'any',  'any', 'any')
 
 #----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
+def product_category_code(rowCount):
+
+	t = Table.Table('ecomm_shop', 'product_category_code')
+	t.add( Column.Column('product_category_code',   cDmy.DT_STR, 'cat-code-',  '',         cDmy.FMT_4d))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
+def product_sub_category_code(rowCount):
+
+	t = Table.Table('ecomm_shop', 'product_sub_category_code')
+	t.add( Column.Column('product_sub_category_code',   cDmy.DT_STR, 'sub-cat-code-',  '',         cDmy.FMT_4d))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
+def attribute_key_code(rowCount):
+
+	t = Table.Table('ecomm_shop', 'attribute_key_code')
+	t.add( Column.Column('attribute_key_code',   cDmy.DT_STR, 'attr-key-code-',  '',         cDmy.FMT_4d))
+	t.add( Column.Column('description',          cDmy.DT_STR, 'attr-desc-',      '',         cDmy.FMT_16d))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
+def payment_type_code(rowCount):
+
+	rowCount=1
+	t = Table.Table('ecomm_shop', 'payment_type_code')
+	t.add( Column.Column('payment_type_code',   cDmy.DT_STR, '',  'PTC_CREDIT_CARD',    cDmy.FMT_EMPTY))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
+def currency_code(rowCount):
+	rowCount=1
+	t = Table.Table('ecomm_shop', 'currency_code')
+	t.add( Column.Column('currency_code',   cDmy.DT_STR, '',  'INR',         cDmy.FMT_EMPTY))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
+def unit_code(rowCount):
+
+	rowCount=1
+	t = Table.Table('ecomm_shop', 'unit_code')
+	t.add( Column.Column('unit_code',   cDmy.DT_STR, '',  'UC_1',         cDmy.FMT_EMPTY))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
+def discount_type_code(rowCount):
+
+	t = Table.Table('ecomm_shop', 'discount_type_code')
+	t.add( Column.Column('discount_type_code',   cDmy.DT_STR, '',  'DT_PERCENT',         cDmy.FMT_EMPTY))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
+def shop_artefact(rowCount):
+
+	rowCount=1
+	t = Table.Table('ecomm_shop', 'shop_artefact')
+	t.add( Column.Column('artefact_name', cDmy.DT_STR, 'artefact-',    '',         cDmy.FMT_2d))
+	t.add( Column.Column('file_path',     cDmy.DT_STR, '',             '/var/tmp/',         cDmy.FMT_EMPTY))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
+def shop_detail(rowCount):
+
+	rowCount=1
+	t = Table.Table('ecomm_shop', 'shop_detail')
+	t.add( Column.Column('shop_name',   cDmy.DT_STR, '',    'HealtyOptions Inc',         cDmy.FMT_EMPTY))
+	t.add( Column.Column('description', cDmy.DT_STR, '',    'HealtyOptions Inc',         cDmy.FMT_EMPTY))
+	t.add( Column.Column('motto',       cDmy.DT_STR, '',    'live healthy...live long',  cDmy.FMT_EMPTY))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
 #
 #----------------------------------------------------------
 def customer(rowCount):
@@ -118,10 +216,29 @@ def vendor_product(rowCount):
 #----------------------------------------------------------
 # tbd
 #----------------------------------------------------------
+def vendor_product_price(rowCount):
+
+	t = Table.Table('ecomm_shop', 'vendor_product_price')
+	t.add( Column.Column('vendor_product_id',   cDmy.DT_NUM, '999',    '',         cDmy.FMT_4d))
+	t.add( Column.Column('vid',                 cDmy.DT_NUM, '',       '1',        cDmy.FMT_EMPTY))
+	t.add( Column.Column('is_latest_vid',       cDmy.DT_STR, '',       'Y',        cDmy.FMT_EMPTY))
+	t.add( Column.Column('unit_code',           cDmy.DT_STR, '',       'UC_1',     cDmy.FMT_EMPTY))
+	t.add( Column.Column('price',               cDmy.DT_NUM, '',       '10.12',    cDmy.FMT_EMPTY))
+	t.add( Column.Column('currency_code',       cDmy.DT_STR, '',       'INR',      cDmy.FMT_EMPTY))
+	sql = SqlStatement.SqlStatement(t)
+	return sql.generateInsert() + sql.generateSelect(rowCount)
+
+#----------------------------------------------------------
+# tbd
+#----------------------------------------------------------
 def vendor_product_discount(rowCount):
 
 	t = Table.Table('ecomm_shop', 'vendor_product_discount')
-	t.add( Column.Column('tbd',   cDmy.tbd, '999',    '',         cDmy.tbd))
+	t.add( Column.Column('vendor_product_id',   cDmy.DT_NUM, '999',    '',         cDmy.FMT_4d))
+	t.add( Column.Column('vid',                 cDmy.DT_NUM, '',       '1',        cDmy.FMT_EMPTY))
+	t.add( Column.Column('is_latest_vid',       cDmy.DT_STR, '',       'Y',        cDmy.FMT_EMPTY))
+	t.add( Column.Column('discount_value',      cDmy.DT_NUM, '',       '10.00',    cDmy.FMT_EMPTY))
+	t.add( Column.Column('discount_type_code',  cDmy.DT_STR, '',      'DC_PERCENT', cDmy.FMT_EMPTY))
 	sql = SqlStatement.SqlStatement(t)
 	return sql.generateInsert() + sql.generateSelect(rowCount)
 
@@ -131,48 +248,9 @@ def vendor_product_discount(rowCount):
 def vendor_product_image(rowCount):
 
 	t = Table.Table('ecomm_shop', 'vendor_product_image')
-	t.add( Column.Column('tbd',   cDmy.tbd, '999',    '',         cDmy.tbd))
-	sql = SqlStatement.SqlStatement(t)
-	return sql.generateInsert() + sql.generateSelect(rowCount)
-
-#----------------------------------------------------------
-# tbd
-#----------------------------------------------------------
-def vendor_product_price(rowCount):
-
-	t = Table.Table('ecomm_shop', 'tbd')
-	t.add( Column.Column('tbd',   cDmy.tbd, '999',    '',         cDmy.tbd))
-	sql = SqlStatement.SqlStatement(t)
-	return sql.generateInsert() + sql.generateSelect(rowCount)
-
-#----------------------------------------------------------
-# tbd
-#----------------------------------------------------------
-def attribute_key_code(rowCount):
-
-	t = Table.Table('ecomm_shop', 'attribute_key_code')
-	t.add( Column.Column('attribute_key_code',   cDmy.DT_STR, 'attr-key-code-',  '',         cDmy.FMT_4d))
-	t.add( Column.Column('description',          cDmy.DT_STR, 'attr-desc-',      '',         cDmy.FMT_16d))
-	sql = SqlStatement.SqlStatement(t)
-	return sql.generateInsert() + sql.generateSelect(rowCount)
-
-#----------------------------------------------------------
-# tbd
-#----------------------------------------------------------
-def category_code(rowCount):
-
-	t = Table.Table('ecomm_shop', 'category_code')
-	t.add( Column.Column('category_code',   cDmy.DT_STR, 'cat-code-',  '',         cDmy.FMT_4d))
-	sql = SqlStatement.SqlStatement(t)
-	return sql.generateInsert() + sql.generateSelect(rowCount)
-
-#----------------------------------------------------------
-# tbd
-#----------------------------------------------------------
-def sub_category_code(rowCount):
-
-	t = Table.Table('ecomm_shop', 'sub_category_code')
-	t.add( Column.Column('sub_category_code',   cDmy.DT_STR, 'sub-cat-code-',  '',         cDmy.FMT_4d))
+	t.add( Column.Column('vendor_product_id',   cDmy.DT_NUM, '999',    '',         cDmy.tbd))
+	t.add( Column.Column('iteration',           cDmy.DT_NUM, '',       '1',        cDmy.FMT_EMPTY))
+	t.add( Column.Column('image_path',          cDmy.DT_STR, '',       '/var/tmp', cDmy.FMT_EMPTY))
 	sql = SqlStatement.SqlStatement(t)
 	return sql.generateInsert() + sql.generateSelect(rowCount)
 
@@ -203,10 +281,10 @@ def product_attribute_kv(rowCount):
 #----------------------------------------------------------
 # tbd
 #----------------------------------------------------------
-def product_category(rowCount):
+def product_category_rel(rowCount):
 
 
-	t = Table.Table('ecomm_shop', 'product_category')
+	t = Table.Table('ecomm_shop', 'product_category_rel')
 	t.add( Column.Column('product_id',      cDmy.DT_NUM,     '999',        '',      cDmy.FMT_4d))
 	t.add( Column.Column('iteration',       cDmy.DT_NUM,     '',           '1',     cDmy.FMT_EMPTY))
 	t.add( Column.Column('category_code1',  cDmy.DT_STR,     'cat-code-',  '',      cDmy.FMT_4d))
@@ -215,31 +293,6 @@ def product_category(rowCount):
 	t.add( Column.Column('sub_category_code1',  cDmy.DT_STR, 'sub-cat-code-',  '',  cDmy.FMT_4d))
 	t.add( Column.Column('sub_category_code2',  cDmy.DT_STR, 'sub-cat-code-',  '',  cDmy.FMT_4d))
 	t.add( Column.Column('sub_category_code3',  cDmy.DT_STR, 'sub-cat-code-',  '',  cDmy.FMT_4d))
-	sql = SqlStatement.SqlStatement(t)
-	return sql.generateInsert() + sql.generateSelect(rowCount)
-
-#----------------------------------------------------------
-# tbd
-#----------------------------------------------------------
-def shop_artefact(rowCount):
-
-	rowCount=1
-	t = Table.Table('ecomm_shop', 'shop_artefact')
-	t.add( Column.Column('artefact_name', cDmy.DT_STR, 'artefact-',    '',         cDmy.FMT_2d))
-	t.add( Column.Column('file_path',     cDmy.DT_STR, '',             '/var/tmp/',         cDmy.FMT_EMPTY))
-	sql = SqlStatement.SqlStatement(t)
-	return sql.generateInsert() + sql.generateSelect(rowCount)
-
-#----------------------------------------------------------
-# tbd
-#----------------------------------------------------------
-def shop_detail(rowCount):
-
-	rowCount=1
-	t = Table.Table('ecomm_shop', 'shop_detail')
-	t.add( Column.Column('shop_name',   cDmy.DT_STR, '',    'HealtyOptions Inc',         cDmy.FMT_EMPTY))
-	t.add( Column.Column('description', cDmy.DT_STR, '',    'HealtyOptions Inc',         cDmy.FMT_EMPTY))
-	t.add( Column.Column('motto',       cDmy.DT_STR, '',    'live healthy...live long',  cDmy.FMT_EMPTY))
 	sql = SqlStatement.SqlStatement(t)
 	return sql.generateInsert() + sql.generateSelect(rowCount)
 
@@ -260,12 +313,17 @@ def tbd(rowCount):
 rowCount=10
 
 functions = [
+"product_category_code",
+"product_sub_category_code",
+"attribute_key_code",
+"payment_type_code",
+"currency_code",
+"unit_code",
+"discount_type_code",
+
 "shop_artefact",
 "shop_detail",
 
-"category_code",
-"sub_category_code",
-"attribute_key_code",
 
 "customer",
 "customer_profile",
@@ -274,15 +332,20 @@ functions = [
 
 "product",
 "product_attribute_kv",
-"product_category",
+"product_category_rel",
 
 "vendor",
 "vendor_detail",
 "vendor_product",
+"vendor_product_price",
+"vendor_product_discount",
+"vendor_product_image",
+
+
 ]
 
 functions2 = [
-"shop_detail",
+"vendor_product_discount",
 ]
 
 for f in functions:

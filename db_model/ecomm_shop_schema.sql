@@ -48,6 +48,16 @@ DEFAULT CHARACTER SET = utf8;
 ----------------------------------------------------
 -- Customer management
 ----------------------------------------------------
+----------------------------------------------------
+DROP TABLE IF EXISTS ecomm_shop.payment_type_code ;
+
+CREATE TABLE IF NOT EXISTS ecomm_shop.payment_type_code (
+  payment_type_code VARCHAR(50) NOT NULL,
+  updated_by         VARCHAR(50) NOT NULL default 'system',
+  updated_date      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (payment_type_code))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 ----------------------------------------------------
 DROP TABLE IF EXISTS ecomm_shop.customer ;
@@ -85,7 +95,7 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.customer_profile (
   CONSTRAINT fk_customer_profile_ci
     FOREIGN KEY (customer_id)
     REFERENCES ecomm_shop.customer (customer_id)
-    ON DELETE NO ACTION)
+    ON DELETE RESTRICT)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -113,8 +123,8 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.customer_address (
   CONSTRAINT fk_customer_address_ci
     FOREIGN KEY (customer_id)
     REFERENCES ecomm_shop.customer (customer_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -127,17 +137,25 @@ DROP TABLE IF EXISTS ecomm_shop.customer_payment_info ;
 CREATE TABLE IF NOT EXISTS ecomm_shop.customer_payment_info (
   customer_payment_info_id      BIGINT NOT NULL,
   customer_id                   BIGINT NOT NULL,
-  payment_type_code             VARCHAR(25) NOT NULL,
+  payment_type_code             VARCHAR(50) NOT NULL,
   payment_number                VARCHAR(50) NOT NULL,
   expiry_date_mm_yy             VARCHAR(6) NOT NULL,
   updated_by       VARCHAR(50) NOT NULL default 'system',
   updated_date                  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (customer_payment_info_id),
+
   CONSTRAINT fk_customer_payment_info_ci
     FOREIGN KEY (customer_id)
     REFERENCES ecomm_shop.customer (customer_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+
+  CONSTRAINT fk_customer_payment_info_ptc
+    FOREIGN KEY (payment_type_code)
+    REFERENCES ecomm_shop.payment_type (payment_type_code)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -148,24 +166,45 @@ ON ecomm_shop.customer_payment_info (customer_id);
 -- Product management
 ----------------------------------------------------
 ----------------------------------------------------
-DROP TABLE IF EXISTS ecomm_shop.category_code ;
+DROP TABLE IF EXISTS ecomm_shop.unit_code ;
 
-CREATE TABLE IF NOT EXISTS ecomm_shop.category_code (
-  category_code     VARCHAR(100) NOT NULL,
-  updated_by        VARCHAR(50) NOT NULL default 'system',
+CREATE TABLE IF NOT EXISTS ecomm_shop.unit_code (
+  unit_code         VARCHAR(50) NOT NULL,
+  updated_by         VARCHAR(50) NOT NULL default 'system',
   updated_date      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (category_code))
+  PRIMARY KEY (unit_code))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+----------------------------------------------------
+DROP TABLE IF EXISTS ecomm_shop.discount_type_code ;
+
+CREATE TABLE IF NOT EXISTS ecomm_shop.discount_type_code (
+  discount_type_code VARCHAR(50) NOT NULL,
+  updated_by         VARCHAR(50) NOT NULL default 'system',
+  updated_date      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (discount_type_code))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
 ----------------------------------------------------
-DROP TABLE IF EXISTS ecomm_shop.sub_category_code ;
+DROP TABLE IF EXISTS ecomm_shop.product_category_code ;
 
-CREATE TABLE IF NOT EXISTS ecomm_shop.sub_category_code (
-  sub_category_code VARCHAR(100) NOT NULL,
-  updated_by        VARCHAR(50) NOT NULL default 'system',
-  updated_date      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (sub_category_code))
+CREATE TABLE IF NOT EXISTS ecomm_shop.product_category_code (
+  product_category_code  VARCHAR(50) NOT NULL,
+  updated_by             VARCHAR(50) NOT NULL default 'system',
+  updated_date           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (product_category_code))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+----------------------------------------------------
+DROP TABLE IF EXISTS ecomm_shop.product_sub_category_code;
+
+CREATE TABLE IF NOT EXISTS ecomm_shop.product_sub_category_code(
+  product_sub_category_code VARCHAR(100) NOT NULL,
+  updated_by                VARCHAR(50) NOT NULL default 'system',
+  updated_date              DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (product_sub_category_code))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -186,51 +225,51 @@ CREATE UNIQUE INDEX idx_product_pc
 ON ecomm_shop.product (product_code);
 
 ----------------------------------------------------
-DROP TABLE IF EXISTS ecomm_shop.product_category ;
+DROP TABLE IF EXISTS ecomm_shop.product_category_rel ;
 
-CREATE TABLE IF NOT EXISTS ecomm_shop.product_category (
+CREATE TABLE IF NOT EXISTS ecomm_shop.product_category_rel (
   product_id           BIGINT NOT NULL,
   iteration            BIGINT NOT NULL,
-  category_code1       VARCHAR(100) NOT NULL,
-  category_code2       VARCHAR(100),
-  category_code3       VARCHAR(100),
-  sub_category_code1   VARCHAR(100) NOT NULL,
-  sub_category_code2   VARCHAR(100),
-  sub_category_code3   VARCHAR(100),
+  category_code1       VARCHAR(50) NOT NULL,
+  category_code2       VARCHAR(50),
+  category_code3       VARCHAR(50),
+  sub_category_code1   VARCHAR(50) NOT NULL,
+  sub_category_code2   VARCHAR(50),
+  sub_category_code3   VARCHAR(50),
 
   updated_by       VARCHAR(50) NOT NULL default 'system',
   updated_date      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (product_id, iteration),
 
-  CONSTRAINT fk_product_category_pi
+  CONSTRAINT fk_product_category_rel_pi
     FOREIGN KEY (product_id)
     REFERENCES ecomm_shop.product(product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT fk_product_category_cc1
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_product_category_rel_cc1
     FOREIGN KEY (category_code1)
-    REFERENCES ecomm_shop.category_code(category_code)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT fk_product_category_scc1
+    REFERENCES ecomm_shop.product_category_code(product_category_code)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_product_category_rel_scc1
     FOREIGN KEY (category_code1)
-    REFERENCES ecomm_shop.sub_category_code(sub_category_code)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES ecomm_shop.product_sub_category(product_sub_category_code)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE INDEX idx_product_category_cc123
-ON ecomm_shop.product_category (category_code1, category_code2, category_code3);
+CREATE INDEX idx_product_category_rel_cc123
+ON ecomm_shop.product_category_rel (category_code1, category_code2, category_code3);
 
-CREATE INDEX idx_product_category_scc123
-ON ecomm_shop.product_category (sub_category_code1, sub_category_code2, sub_category_code3);
+CREATE INDEX idx_product_category_rel_scc123
+ON ecomm_shop.product_category_rel (sub_category_code1, sub_category_code2, sub_category_code3);
 
 ----------------------------------------------------
 DROP TABLE IF EXISTS ecomm_shop.attribute_key_code ;
 
 CREATE TABLE IF NOT EXISTS ecomm_shop.attribute_key_code (
-  attribute_key_code       VARCHAR(100) NOT NULL,
+  attribute_key_code       VARCHAR(50) NOT NULL,
   description              VARCHAR(500) NOT NULL,
   updated_by       VARCHAR(50) NOT NULL default 'system',
   updated_date      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -244,7 +283,7 @@ DROP TABLE IF EXISTS ecomm_shop.product_attribute_kv ;
 
 CREATE TABLE IF NOT EXISTS ecomm_shop.product_attribute_kv (
   product_id            BIGINT NOT NULL,
-  attribute_key_code    VARCHAR(100) NOT NULL,
+  attribute_key_code    VARCHAR(50) NOT NULL,
   attribute_value       VARCHAR(100) NOT NULL,
   updated_by       VARCHAR(50) NOT NULL default 'system',
   updated_date      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -253,14 +292,14 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.product_attribute_kv (
   CONSTRAINT fk_product_attribute_kv_pi
     FOREIGN KEY (product_id)
     REFERENCES ecomm_shop.product(product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
 
   CONSTRAINT fk_product_attribute_kv_akc
     FOREIGN KEY (attribute_key_code)
     REFERENCES ecomm_shop.attribute_key_code(attribute_key_code)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -297,8 +336,8 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_detail (
   CONSTRAINT fk_vendor_detail_vi
     FOREIGN KEY (vendor_id)
     REFERENCES ecomm_shop.vendor (vendor_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -317,13 +356,13 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_product (
   CONSTRAINT fk_vendor_product_pi
     FOREIGN KEY (product_id)
     REFERENCES ecomm_shop.product(product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
   CONSTRAINT fk_vendor_product_vi
     FOREIGN KEY (vendor_id)
     REFERENCES ecomm_shop.vendor (vendor_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -344,8 +383,8 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_product_image (
   CONSTRAINT fk_vendor_product_image_pi
     FOREIGN KEY (vendor_product_id)
     REFERENCES ecomm_shop.vendor_product(vendor_product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -353,11 +392,23 @@ DEFAULT CHARACTER SET = utf8;
 ----------------------------------------------------
 -- Price management
 ----------------------------------------------------
+----------------------------------------------------
+DROP TABLE IF EXISTS ecomm_shop.currency_code ;
+
+CREATE TABLE IF NOT EXISTS ecomm_shop.currency_code (
+  currency_code          VARCHAR(10) NOT NULL,
+  updated_by             VARCHAR(50) NOT NULL default 'system',
+  updated_date           DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (currency_code))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
 
 ----------------------------------------------------
-DROP TABLE IF EXISTS ecomm_shop.currency ;
+DROP TABLE IF EXISTS ecomm_shop.currency_rate ;
 
-CREATE TABLE IF NOT EXISTS ecomm_shop.currency (
+CREATE TABLE IF NOT EXISTS ecomm_shop.currency_rate (
+  currency_rate_id          BIGINT NOT NULL,
   currency_code             VARCHAR(10) NOT NULL,
   vid                       BIGINT NOT NULL,
   is_latest_vid             CHAR(1) NOT NULL DEFAULT 'Y',
@@ -365,10 +416,16 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.currency (
   updated_by       VARCHAR(50) NOT NULL default 'system',
   valid_from                DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   valid_to                  DATETIME NOT NULL DEFAULT '9999-12-31',
-  PRIMARY KEY (currency_code, vid))
+  PRIMARY KEY (currency_code, vid),
+
+  CONSTRAINT fk_currency_rate_cc
+    FOREIGN KEY (currency_code)
+    REFERENCES ecomm_shop.currency_code(currency_code)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
+
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
 
 ----------------------------------------------------
 DROP TABLE IF EXISTS ecomm_shop.vendor_product_price ;
@@ -377,7 +434,7 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_product_price (
   vendor_product_id         BIGINT NOT NULL,
   vid                       BIGINT NOT NULL,
   is_latest_vid             CHAR(1) NOT NULL DEFAULT 'Y',
-  unit_code                 VARCHAR(100) NOT NULL,
+  unit_code                 VARCHAR(50) NOT NULL,
   price                     DECIMAL(15,2) NOT NULL,
   currency_code             VARCHAR(10) NOT NULL,
   updated_by       VARCHAR(50) NOT NULL default 'system',
@@ -388,20 +445,20 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_product_price (
   CONSTRAINT fk_vendor_product_price_vpi
     FOREIGN KEY (vendor_product_id)
     REFERENCES ecomm_shop.vendor_product(vendor_product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
 
   CONSTRAINT fk_vendor_product_price_uc
     FOREIGN KEY (unit_code)
     REFERENCES ecomm_shop.unit_code(unit_code)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
 
   CONSTRAINT fk_vendor_product_price_cc
     FOREIGN KEY (currency_code)
-    REFERENCES ecomm_shop.currency(currency_code)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    REFERENCES ecomm_shop.currency_code(currency_code)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -415,8 +472,8 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_product_discount (
   vid                       BIGINT NOT NULL,
   is_latest_vid             CHAR(1) NOT NULL DEFAULT 'Y',
   discount_value            INT NOT NULL,
-  discount_type             VARCHAR(50) NOT NULL,
-  updated_by       VARCHAR(50) NOT NULL default 'system',
+  discount_type_code        VARCHAR(50) NOT NULL,
+  updated_by                VARCHAR(50) NOT NULL default 'system',
   valid_from                DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   valid_to                  DATETIME NOT NULL DEFAULT '9999-12-31',
   PRIMARY KEY (vendor_product_id, vid),
@@ -424,8 +481,14 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_product_discount (
   CONSTRAINT fk_vendor_product_discount_vpi
     FOREIGN KEY (vendor_product_id)
     REFERENCES ecomm_shop.vendor_product(vendor_product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
+
+  CONSTRAINT fk_vendor_product_discount_dtc
+    FOREIGN KEY (discount_type_code)
+    REFERENCES ecomm_shop.discount_type_code(discount_type_code)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -451,14 +514,14 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.inventory_transaction (
   CONSTRAINT fk_inventory_transaction_vpi
     FOREIGN KEY (vendor_product_id)
     REFERENCES ecomm_shop.vendor_product(vendor_product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
 
   CONSTRAINT fk_inventory_transaction_uc
     FOREIGN KEY (unit_code)
     REFERENCES ecomm_shop.unit_code(unit_code)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -480,8 +543,8 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.inventory_asof (
   CONSTRAINT fk_inventory_asof_vpi
     FOREIGN KEY (vendor_product_id)
     REFERENCES ecomm_shop.vendor_product(vendor_product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -506,26 +569,26 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.buy_order (
   CONSTRAINT fk_buy_order_ci
     FOREIGN KEY (customer_id)
     REFERENCES ecomm_shop.customer(customer_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
 
   CONSTRAINT fk_buy_order_bai
     FOREIGN KEY (billing_address_id)
     REFERENCES ecomm_shop.customer_address(customer_address_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
 
   CONSTRAINT fk_buy_order_sai
     FOREIGN KEY (shipping_address_id)
     REFERENCES ecomm_shop.customer_address(customer_address_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
 
   CONSTRAINT fk_buy_order_pi
     FOREIGN KEY (payment_info_id)
     REFERENCES ecomm_shop.customer_payment_info(customer_payment_info_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -550,14 +613,14 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.buy_order_detail (
   CONSTRAINT fk_buy_order_detail_boi
     FOREIGN KEY (buy_order_id)
     REFERENCES ecomm_shop.buy_order(buy_order_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
 
   CONSTRAINT fk_buy_order_detail_vpi
     FOREIGN KEY (vendor_product_id)
     REFERENCES ecomm_shop.vendor_product(vendor_product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -575,8 +638,8 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.cancel_order (
   CONSTRAINT fk_cancel_order_boi
     FOREIGN KEY (buy_order_id)
     REFERENCES ecomm_shop.buy_order(buy_order_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
@@ -599,14 +662,14 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.cancel_order_detail (
   CONSTRAINT fk_cancel_order_detail_coi
     FOREIGN KEY (cancel_order_id)
     REFERENCES ecomm_shop.cancel_order(cancel_order_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE,
 
   CONSTRAINT fk_cancel_order_detail_vpi
     FOREIGN KEY (vendor_product_id)
     REFERENCES ecomm_shop.vendor_product(vendor_product_id)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
@@ -618,46 +681,49 @@ ON ecomm_shop.cancel_order_detail (vendor_product_id);
 -- Order workflow
 ----------------------------------------------------
 ----------------------------------------------------
-DROP TABLE IF EXISTS ecomm_shop.workflow_state_code ;
+DROP TABLE IF EXISTS ecomm_shop.wf_event_code;
 
-CREATE TABLE IF NOT EXISTS ecomm_shop.workflow_state_code (
-  workflow_category    VARCHAR(100) NOT NULL,
-  workflow_state_code  VARCHAR(100) NOT NULL,
-  updated_by       VARCHAR(50) NOT NULL default 'system',
+CREATE TABLE IF NOT EXISTS ecomm_shop.wf_event_code (
+  wf_event_code      VARCHAR(50) NOT NULL,
+  updated_by         VARCHAR(50) NOT NULL default 'system',
   updated_date       DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (workflow_category, workflow_state_code))
+  PRIMARY KEY (wf_event_code))
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
 
-CREATE UNIQUE INDEX idx_workflow_state_code_wsc
-ON ecomm_shop.workflow_state_code (workflow_state_code);
+----------------------------------------------------
+DROP TABLE IF EXISTS ecomm_shop.wf_state_code;
+
+CREATE TABLE IF NOT EXISTS ecomm_shop.wf_state (
+  wf_state_code       VARCHAR(50) NOT NULL,
+  updated_by          VARCHAR(50) NOT NULL default 'system',
+  updated_date        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (wf_state_code))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
 
 ----------------------------------------------------
 DROP TABLE IF EXISTS ecomm_shop.workflow_status ;
 
 CREATE TABLE IF NOT EXISTS ecomm_shop.workflow_status (
   vendor_product_id         BIGINT NOT NULL,
-  event_type                VARCHAR(100) NOT NULL,
+  wf_event_code             VARCHAR(50) NOT NULL,
   event_id                  VARCHAR(100) NOT NULL,
   vid                       BIGINT NOT NULL,
   is_latest_vid             CHAR(1) NOT NULL DEFAULT 'Y',
-  workflow_category         VARCHAR(100) NOT NULL,
-  workflow_state_code       VARCHAR(100) NOT NULL,
+  wf_state_code             VARCHAR(50) NOT NULL,
   valid_from                DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   valid_to                  DATETIME NOT NULL DEFAULT '9999-12-31',
-  PRIMARY KEY (event_type, event_id, vid),
+  PRIMARY KEY (event_id, vid),
 
   CONSTRAINT fk_workflow_status_wsc
-    FOREIGN KEY (workflow_state_code)
-    REFERENCES ecomm_shop.workflow_state_code(workflow_state_code)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    FOREIGN KEY (wf_state_code)
+    REFERENCES ecomm_shop.wf_state_code(wf_state_code)
+    ON DELETE RESTRICT
+    ON UPDATE CASCADE)
 
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8;
-
-CREATE UNIQUE INDEX idx_workflow_status_wcws
-ON ecomm_shop.workflow_status (workflow_category, workflow_state_code);
 
 CREATE INDEX idx_workflow_status_vpi
 ON ecomm_shop.workflow_status (vendor_product_id)
