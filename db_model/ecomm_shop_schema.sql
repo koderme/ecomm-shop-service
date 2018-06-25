@@ -21,9 +21,9 @@ DROP TABLE IF EXISTS ecomm_shop.shop_detail ;
 
 CREATE TABLE IF NOT EXISTS ecomm_shop.shop_detail (
   shop_name         VARCHAR(100) NOT NULL,
-  shop_description  VARCHAR(500) NOT NULL,
-  shop_motto        VARCHAR(500) NOT NULL,
-  updated_by       VARCHAR(50) NOT NULL default 'system',
+  description       VARCHAR(500) NOT NULL,
+  motto             VARCHAR(500) NOT NULL,
+  updated_by        VARCHAR(50) NOT NULL default 'system',
   updated_date      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (shop_name))
 ENGINE = InnoDB
@@ -127,8 +127,8 @@ DROP TABLE IF EXISTS ecomm_shop.customer_payment_info ;
 CREATE TABLE IF NOT EXISTS ecomm_shop.customer_payment_info (
   customer_payment_info_id      BIGINT NOT NULL,
   customer_id                   BIGINT NOT NULL,
-  payment_type                  VARCHAR(100) NOT NULL,
-  payment_code                  VARCHAR(100) NOT NULL,
+  payment_type_code             VARCHAR(25) NOT NULL,
+  payment_number                VARCHAR(50) NOT NULL,
   expiry_date_mm_yy             VARCHAR(6) NOT NULL,
   updated_by       VARCHAR(50) NOT NULL default 'system',
   updated_date                  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -331,9 +331,9 @@ CREATE UNIQUE INDEX idx_vendor_product_vipi
 ON ecomm_shop.vendor_product (vendor_id, product_id, valid_from);
 
 ----------------------------------------------------
-DROP TABLE IF EXISTS ecomm_shop.vendor_product_images ;
+DROP TABLE IF EXISTS ecomm_shop.vendor_product_image ;
 
-CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_product_images (
+CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_product_image (
   vendor_product_id     BIGINT NOT NULL,
   iteration             BIGINT NOT NULL,
   image_path            VARCHAR(500) NOT NULL,
@@ -341,7 +341,7 @@ CREATE TABLE IF NOT EXISTS ecomm_shop.vendor_product_images (
   updated_date          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
   PRIMARY KEY (vendor_product_id, iteration),
-  CONSTRAINT fk_vendor_product_images_pi
+  CONSTRAINT fk_vendor_product_image_pi
     FOREIGN KEY (vendor_product_id)
     REFERENCES ecomm_shop.vendor_product(vendor_product_id)
     ON DELETE NO ACTION
